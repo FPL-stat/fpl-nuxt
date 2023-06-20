@@ -9,6 +9,7 @@ const navigation = [
   { name: 'Players', href: '/players', current: route.name === 'players' },
   { name: 'Fixtures', href: '/fixtures', current: route.name === 'fixtures' },
   { name: 'Managers', href: '/managers', current: route.name === 'managers' },
+  { name: 'Teams', href: '/teams', current: route.name === 'teams' },
 ]
 </script>
 
