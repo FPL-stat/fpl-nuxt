@@ -36,7 +36,7 @@ const rows = computed(() => {
 })
 
 watch(data, newData => {
-  console.log('data arrived...', newData)
+  // console.log('data arrived...', newData)
   if (newData) teams.value = newData
   
 })
