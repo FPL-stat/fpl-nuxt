@@ -4,6 +4,12 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
 
+const currentRoute = computed(() => route.fullPath)
+
+// watch(currentRoute, newRoute => {
+//   console.log('route changed: ', newRoute)
+// })
+
 const navigation = [
   { name: 'Dashboard', href: '/', current: route.name === 'index' },
   { name: 'Players', href: '/players', current: route.name === 'players' },
@@ -55,6 +61,7 @@ const navigation = [
         <NuxtLink v-for="item in navigation" :key="item.name" :to="item.href" :aria-current="item.current ? 'page' : undefined">
           <DisclosureButton as="a"
             class='text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium'
+            :class="currentRoute === item.href ? 'bg-gray-900 text-white' : ''"
             :aria-current="item.current ? 'page' : undefined">
             {{ item.name }}
           </DisclosureButton>
@@ -66,6 +73,6 @@ const navigation = [
 
 <style scoped>
 .router-link-active {
-  @apply bg-gray-900 text-white
+  @apply bg-gray-900 text-blue-300
 }
 </style>
