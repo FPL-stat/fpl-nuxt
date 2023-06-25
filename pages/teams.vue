@@ -1,33 +1,8 @@
 <script setup lang='ts'>
-
-interface ITeam {
-  code: number,
-  draw: number,
-  form: string,
-  loss: number,
-  name: string,
-  played: number,
-  points: number,
-  position: number,
-  pulse_id: number,
-  short_name: string,
-  strength: number,
-  strength_attack_away: number,
-  strength_attack_home: number,
-  strength_defence_away: number,
-  strength_defence_home: number,
-  strength_overall_away: number,
-  strength_overall_home: number,
-  team_division: string,
-  unavailable: boolean,
-  updated_time: {
-    $date: Date
-  },
-  win: number,
-}
+import type { ITeam } from '../types'
 
 const teams = ref<ITeam[]>([])
-const { data, pending, error, refresh } = await useFetch<ITeam[]>('/api/teams')
+const { data, pending, error, refresh } = await useLazyFetch<ITeam[]>('/api/teams')
 
 const tableFilter = ref('')
 const page = ref(1)
@@ -60,13 +35,12 @@ const rows = computed(() => {
   return filteredRows.value.slice((page.value - 1) * pageCount, (page.value) * pageCount)
 })
 
-onMounted(() => {
-  // console.log('data: ', data.value)
-  if (data.value) {
-    teams.value = data.value
-  }
-  // console.log('teams: ', teams.value)
+watch(data, newData => {
+  console.log('data arrived...', newData)
+  if (newData) teams.value = newData
+  
 })
+
 </script>
 
 <template>
@@ -76,7 +50,7 @@ onMounted(() => {
       <UInput v-model='tableFilter' placeholder='search...' icon="i-heroicons-magnifying-glass-20-solid" />
     </div>
 
-    <UTable :columns='columns' :rows='rows' />
+    <UTable :loading='pending' :columns='columns' :rows='rows' />
 
     <UPagination v-show='tableFilter.length === 0' v-model="page" :page-count="pageCount" :total="teams.length" />
 

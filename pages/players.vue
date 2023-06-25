@@ -1,12 +1,12 @@
 <script setup lang='ts'>
 import type { IPlayer } from '../types'
 
-const { data, pending, error, refresh } = await useFetch<IPlayer[]>('/api/players')
+const { data, pending, error, refresh } = await useLazyFetch<IPlayer[]>('/api/players')
 
 const players = ref<IPlayer[]>([])
 const tableFilter = ref('')
 const page = ref(1)
-const pageCount = 5
+const pageCount = 9
 
 const columns = [
   { key: 'second_name', label: 'Second Name', sortable: true },
@@ -33,11 +33,15 @@ const rows = computed(() => {
   return filteredRows.value.slice((page.value - 1) * pageCount, (page.value) * pageCount)
 })
 
-onMounted(() => {
-  if (data.value) {
-    players.value = data.value
-  }
+watch(data, newData => {
+  if (newData) players.value = newData
 })
+
+// onMounted(() => {
+//   if (data.value) {
+//     players.value = data.value
+//   }
+// })
 
 </script>
 
@@ -48,7 +52,7 @@ onMounted(() => {
       <UInput v-model='tableFilter' placeholder='search...' icon="i-heroicons-magnifying-glass-20-solid" />
     </div>
 
-    <UTable :columns='columns' :rows='rows' />
+    <UTable :loading='pending' :columns='columns' :rows='rows' />
 
     <UPagination v-show='tableFilter.length === 0' v-model="page" :page-count="pageCount" :total="players.length" />
 
