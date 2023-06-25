@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import type { IPlayer } from '../types'
 
-const { data, pending, error, refresh } = await useLazyFetch<IPlayer[]>('/api/players')
+const { data, pending, error, refresh } = await useLazyFetch<IPlayer[]>('/api/players', { server: false })
 
 const players = ref<IPlayer[]>([])
 const tableFilter = ref('')
@@ -37,11 +37,11 @@ watch(data, newData => {
   if (newData) players.value = newData
 })
 
-// onMounted(() => {
-//   if (data.value) {
-//     players.value = data.value
-//   }
-// })
+onMounted(() => {
+  if (data.value) {
+    players.value = data.value
+  }
+})
 
 </script>
 

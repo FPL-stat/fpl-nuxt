@@ -1,12 +1,15 @@
 <script setup lang='ts'>
+import { server } from 'process';
 import type { ITeam } from '../types'
 
 const teams = ref<ITeam[]>([])
-const { data, pending, error, refresh } = await useLazyFetch<ITeam[]>('/api/teams')
+
+const { data, pending, error, refresh } = await useLazyFetch<ITeam[]>('/api/teams', { server: false })
+
 
 const tableFilter = ref('')
 const page = ref(1)
-const pageCount = 5
+const pageCount = 20
 
 const columns = [
   { key: 'name', label: 'Name' },
@@ -36,9 +39,14 @@ const rows = computed(() => {
 })
 
 watch(data, newData => {
-  // console.log('data arrived...', newData)
+  console.log('data arrived...', newData)
   if (newData) teams.value = newData
   
+})
+onMounted(async () => {
+  if (data.value) {
+    teams.value = data.value
+  }
 })
 
 </script>
