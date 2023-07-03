@@ -58,7 +58,7 @@ onMounted(async () => {
       <UInput v-model='tableFilter' placeholder='search...' icon="i-heroicons-magnifying-glass-20-solid" />
     </div>
 
-    <UTable :loading='pending' :columns='columns' :rows='rows' />
+    <UTable class='overflow-auto' :loading='pending' :columns='columns' :rows='rows' />
 
     <UPagination v-show='tableFilter.length === 0' v-model="page" :page-count="pageCount" :total="teams.length" />
 
