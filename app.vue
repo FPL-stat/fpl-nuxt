@@ -1,3 +1,6 @@
+<script setup>
+</script>
+
 <template>
   <div>
     <!-- <NavBar /> -->
@@ -10,9 +13,3 @@
     </main>
   </div>
 </template>
-
-<script setup>
-const route = useRoute();
-
-console.log(route.name);
-</script>
