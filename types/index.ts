@@ -6,6 +6,12 @@ export interface ISetResponse {
   cause?: any
 }
 
+export interface IDashboardData {
+  highest_points : IPlayer[],
+  expected_goals_90: IPlayer[],
+  expected_assists_90: IPlayer[],
+}
+
 export interface IPlayer {
   assists: number,
   bonus: number,

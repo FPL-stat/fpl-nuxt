@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IPlayer } from "../types";
+import type { IPlayer } from "../../types";
 
 const { data, pending, error, refresh } = await useLazyFetch<IPlayer[]>(
   "/api/players",
@@ -8,8 +8,8 @@ const { data, pending, error, refresh } = await useLazyFetch<IPlayer[]>(
 
 const players = ref<IPlayer[]>([]);
 const tableFilter = ref("");
-const page = ref(1);
-const pageCount = 9;
+// const page = ref(1);
+// const pageCount = 9;
 
 const columns = [
   { key: "second_name", label: "Second Name", sortable: true },
@@ -78,6 +78,9 @@ onMounted(() => {
       :columns="columns"
       :rows="filteredRows"
     >
+      <template #second_name-data="{row}">
+        <NuxtLink :to="`/players/${row.code}`">{{row.second_name}}</NuxtLink>
+      </template>
     </UTable>
 
     <!-- <UPagination -->
