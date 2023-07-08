@@ -123,7 +123,7 @@ onMounted(async () => {
       alpine-dark: (
         borders: none,
         header-background-color: transparent,
-        background-color: transparent,
+        background-color: #171717,
         odd-row-background-color: transparent,
         data-color: #737373,
         row-hover-color: rgb(115, 115, 115, 0.1)
@@ -131,7 +131,7 @@ onMounted(async () => {
       alpine: (
         borders: none,
         header-background-color: transparent,
-        background-color: transparent,
+        background-color: #fff,
         odd-row-background-color: transparent,
         data-color: #737373,
         row-hover-color: rgb(59, 130, 246, 0.2)
