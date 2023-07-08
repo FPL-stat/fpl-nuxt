@@ -16,6 +16,15 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
-    "mongoose": "^7.3.0"
+    "@pinia/nuxt": "^0.4.11",
+    "ag-grid-community": "^30.0.3",
+    "ag-grid-vue3": "^30.0.3",
+    "autoprefixer": "^10.4.14",
+    "mongoose": "^7.3.0",
+    "pinia": "^2.1.4",
+    "postcss": "^8.4.25"
+  },
+  "overrides": {
+    "vue": "latest"
   }
 }
