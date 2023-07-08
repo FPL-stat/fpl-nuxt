@@ -8,7 +8,7 @@
     <NuxtLoadingIndicator />
 
     <SideBar class="hidden sm:flex" />
-    <main class="sm:ml-56 mt-12">
+    <main class="sm:ml-40 mt-12">
       <NuxtPage />
     </main>
   </div>

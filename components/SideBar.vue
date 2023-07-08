@@ -21,7 +21,7 @@ const links = [
 
 <template>
   <div
-    class="fixed top-0 mt-12 pt-4 pb-10 px-8 flex flex-col justify-between overflow-auto h-screen w-56"
+    class="fixed top-0 mt-12 pt-4 pb-10 px-8 flex flex-col justify-between shadow-lg overflow-auto dark:bg-gray-900/30 h-screen w-40"
   >
     <UVerticalNavigation
       :links="links"
