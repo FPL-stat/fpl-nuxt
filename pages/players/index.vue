@@ -1,93 +1,142 @@
 <script setup lang="ts">
-import type { IPlayer } from "../../types";
+import { AgGridVue } from "ag-grid-vue3";
+import type { GridApi, GridReadyEvent, ICellRendererParams } from "ag-grid-community";
+import { reactive } from "vue";
 
-const { data, pending, error, refresh } = await useLazyFetch<IPlayer[]>(
-  "/api/players",
-  { server: false }
+import { IPlayer } from "~/types";
+
+const router = useRouter()
+
+const colorMode = useColorMode();
+const isDark = computed({
+  get() {
+    return colorMode.value === "dark";
+  },
+  set() {
+    colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
+  },
+});
+
+const { data, pending } = useAsyncData<IPlayer[]>("players", () =>
+  $fetch("/api/players")
 );
 
-const players = ref<IPlayer[]>([]);
-const tableFilter = ref("");
-// const page = ref(1);
-// const pageCount = 9;
+function linkRenderer (params: ICellRendererParams<IPlayer>) {
+	const route = {
+		name: 'players-code',
+		params: { code: params.data.code }
+	}
+	const link = document.createElement("a")
+	link.href = router.resolve(route).href
+	link.innerText = params.value
+	link.addEventListener('click', e => {
+		e.preventDefault()
+		router.push(route)
+	})
+	return link
+}
 
-const columns = [
-  { key: "second_name", label: "Second Name", sortable: true },
-  { key: "first_name", label: "First Name", sortable: true },
-  { key: "total_points", label: "Total Points", sortable: true },
-  { key: "starts", label: "Starts", sortable: true },
-  { key: "value_season", label: "Value (Season)", sortable: true },
-  { key: "selected_by_percent", label: "Selected By (%)", sortable: true },
-];
 
+const tableFilter = ref('')
 
-const filteredRows = computed(() => {
-  if (!tableFilter.value) {
-    return players.value.sort((a, b) => {
-      const nameA = a.second_name.toUpperCase();
-      const nameB = b.second_name.toUpperCase();
-      if (nameA < nameB) {
-        return -1; // a should come before b
-      }
-      if (nameA > nameB) {
-        return 1; // a should come after b
-      }
-      return 0;
-    });
-  }
-  return players.value.filter((player) => {
-    return Object.values(player).some((value) => {
-      return String(value)
-        .toLowerCase()
-        .includes(tableFilter.value.toLowerCase());
-    });
-  });
+const gridApi = ref<GridApi|null>(null);
+const onGridReady = (params: GridReadyEvent) => {
+  gridApi.value = params.api;
+};
+
+const rowData = reactive({ rows: <IPlayer[]>[] });
+const columnDefs = reactive({
+  value: [
+    { headerName: "Second Name", field: "second_name", resizable: true, cellRenderer: linkRenderer },
+    { headerName: "First Name", field: "first_name" },
+    { headerName: "Total Points", field: "total_points" },
+    { headerName: "Starts", field: "starts", minWidth: 100 },
+    { headerName: "Season Value", field: "value_season" },
+    { headerName: "Selected (%)", field: "selected_by_percent" },
+  ],
 });
+const defaultColDef = {
+  sortable: true,
+  filter: true,
+  flex: 1,
+  minWidth: 140,
+};
 
-//const paginatedRows = computed(() => {
-//  return filteredRows.value.slice(
-//    (page.value - 1) * pageCount,
-//    page.value * pageCount
-//  );
-//});
+function onTableFilterChange() {
+  if (gridApi.value) gridApi.value.setQuickFilter(tableFilter.value)
+}
+
+
+
 
 watch(data, (newData) => {
-  if (newData) players.value = newData;
+  if (newData) rowData.rows = newData;
 });
 
-onMounted(() => {
+onMounted(async () => {
   if (data.value) {
-    players.value = data.value;
+    rowData.rows = data.value;
   }
+  console.log(data.value);
 });
 </script>
 
 <template>
-  <section class="p-8">
-    <div class="w-60">
-      <UInput
-        v-model="tableFilter"
-        placeholder="search..."
-        icon="i-heroicons-magnifying-glass-20-solid"
-      />
-    </div>
-
-    <UTable
-      class="overflow-auto"
-      :loading="pending"
-      :columns="columns"
-      :rows="filteredRows"
-    >
-      <template #second_name-data="{row}">
-        <NuxtLink :to="`/players/${row.code}`">{{row.second_name}}</NuxtLink>
-      </template>
-    </UTable>
-
-    <!-- <UPagination -->
-    <!--   v-show="tableFilter.length === 0" -->
-    <!--   v-model="page" -->
-    <!--   :page-count="pageCount" -->
-    <!--   :total="players.length" -->
-    <!-- /> -->
-  </section>
+  <ClientOnly>
+    <!-- <div class="py-4 px-4 overflow-auto"> -->
+    <UContainer class="py-4">
+      <UCard class="shadow-lg">
+        <div class="w-60">
+          <UInput
+            id="table-quick-filter"
+            @input="onTableFilterChange"
+            v-model="tableFilter"
+            placeholder="search..."
+            icon="i-heroicons-magnifying-glass-20-solid"
+          />
+        </div>
+        
+        <AgGridVue
+          :class="{
+            'ag-theme-alpine-dark': isDark,
+            'ag-theme-alpine': !isDark,
+          }"
+          style="height: 500px"
+          :columnDefs="columnDefs.value"
+          :rowData="rowData.rows"
+          :defaultColDef="defaultColDef"
+          animateRows="true"
+          @grid-ready="onGridReady"
+        />
+      </UCard>
+    </UContainer>
+    <!-- </div> -->
+  </ClientOnly>
 </template>
+
+<style lang="scss">
+@use "../../node_modules/ag-grid-community/styles" as ag;
+
+@include ag.grid-styles(
+  (
+    themes: (
+      alpine-dark: (
+        borders: none,
+        header-background-color: transparent,
+        background-color: transparent,
+        odd-row-background-color: transparent,
+        data-color: #737373,
+        row-hover-color: rgb(115, 115, 115, 0.1)
+      ),
+      alpine: (
+        borders: none,
+        header-background-color: transparent,
+        background-color: transparent,
+        odd-row-background-color: transparent,
+        data-color: #737373,
+        row-hover-color: rgb(59, 130, 246, 0.2)
+      )
+    )
+  )
+);
+</style>
