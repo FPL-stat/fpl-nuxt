@@ -37,7 +37,7 @@ const links = [
 
 <template>
   <div
-    class="z-50 fixed top-0 flex flex-col w-full py-2 px-8 dark:bg-gray-900/30 bg-white/30 border-b border-gray-200 dark:border-gray-800 backdrop-blur-md shadow-md"
+    class="z-50 fixed top-0 flex flex-col w-full py-2 px-8 dark:bg-gray-900/30 bg-white/30 dark:border-b dark:border-gray-800 backdrop-blur-md shadow"
   >
     <div class="flex justify-between gap-2 sm:justify-start items-center">
       <div class="flex items-center">
