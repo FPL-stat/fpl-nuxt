@@ -30,7 +30,7 @@ console.log("dashboard: ", data.value);
 </script>
 
 <template>
-  <UContainer class="py-4 grid md:grid-cols-3 gap-4">
+  <UContainer class="py-4 grid md:grid-cols-2 lg:grid-cols-3 lg gap-4">
     
     <UCard class="shadow-lg">
       <template #header>Highest Points</template>
