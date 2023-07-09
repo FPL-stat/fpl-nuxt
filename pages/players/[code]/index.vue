@@ -22,7 +22,7 @@ onMounted(() => {
   <UContainer class="py-4">
     <UCard>
       <template #header>
-        <div v-if="pending || !player" class="flex items-center space-x-4">
+        <div v-if="!player" class="flex items-center space-x-4">
           <USkeleton class="h-12 w-12 rounded-full" />
           <div class="space-y-2">
             <USkeleton class="h-4 w-[250px]" />
@@ -33,7 +33,7 @@ onMounted(() => {
           {{ player.first_name }} {{ player.second_name }}
         </h2>
       </template>
-      <div v-if="pending || !player" class="space-y-2">
+      <div v-if="!player" class="space-y-2">
             <USkeleton class="h-4 w-[250px]" />
             <USkeleton class="h-4 w-[250px]" />
             <USkeleton class="h-4 w-[250px]" />
