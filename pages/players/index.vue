@@ -9,6 +9,8 @@ import { reactive } from "vue";
 
 import { IPlayer } from "~/types";
 
+import GridLoadingOverlay from "../../components/GridLoadingOverlay.vue"
+
 const router = useRouter();
 
 const colorMode = useColorMode();
@@ -21,7 +23,7 @@ const isDark = computed({
   },
 });
 
-const { data, pending } = useLazyAsyncData<IPlayer[]>("players", () =>
+const { data } = useLazyAsyncData<IPlayer[]>("players", () =>
   $fetch("/api/players")
 );
 
@@ -77,6 +79,10 @@ function onTableFilterChange() {
 watch(data, (newData) => {
   if (newData) rowData.rows = newData;
 });
+
+onMounted(() => {
+  if (data.value) rowData.rows = data.value
+})
 </script>
 
 <template>
@@ -100,6 +106,7 @@ watch(data, (newData) => {
             'ag-theme-alpine': !isDark,
           }"
           style="height: 500px"
+          :loadingOverlayComponent="GridLoadingOverlay"
           :columnDefs="columnDefs.value"
           :rowData="rowData.rows"
           :defaultColDef="defaultColDef"

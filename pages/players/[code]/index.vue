@@ -9,29 +9,38 @@ const { data, pending, error, refresh } = useLazyFetch<IPlayer>(
   `/api/players/${route.params.code}`
 );
 
-watch(pending, (newVal) => {
-  console.log("pending: ", pending);
-  console.log("data: ", data.value);
-  console.log("newVal: ", newVal);
-  player.value = data.value;
-  console.log("player: ", player.value);
+watch(data, (newVal) => {
+  player.value = newVal;
 });
 
 onMounted(() => {
-  if (data.value) {
-    player.value = data.value;
-  }
-});
+  if (data.value) player.value = data.value
+})
 </script>
 
 <template>
   <UContainer class="py-4">
-    <UCard v-if="player">
+    <UCard>
       <template #header>
-        <h2 class="text-2xl">
+        <div v-if="pending || !player" class="flex items-center space-x-4">
+          <USkeleton class="h-12 w-12 rounded-full" />
+          <div class="space-y-2">
+            <USkeleton class="h-4 w-[250px]" />
+            <USkeleton class="h-4 w-[200px]" />
+          </div>
+        </div>
+        <h2 v-if="player" class="text-2xl">
           {{ player.first_name }} {{ player.second_name }}
         </h2>
       </template>
+      <div v-if="pending || !player" class="space-y-2">
+            <USkeleton class="h-4 w-[250px]" />
+            <USkeleton class="h-4 w-[250px]" />
+            <USkeleton class="h-4 w-[250px]" />
+            <USkeleton class="h-4 w-[250px]" />
+            <USkeleton class="h-4 w-[250px]" />
+          </div>
+
       <ul>
         <li v-for="(stat, key) in player" :key="key">{{ key }}: {{ stat }}</li>
       </ul>
