@@ -16,6 +16,10 @@ const links = [
     label: "Fixtures",
     to: "/fixtures",
   },
+  {
+    label: "Test",
+    to: "/test",
+  },
 ];
 </script>
 

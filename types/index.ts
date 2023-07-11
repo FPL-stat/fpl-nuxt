@@ -9,6 +9,7 @@ export interface ISetResponse {
 export interface IAppData {
   updated: string;
   data: {
+    element_types: IElementType[]
     elements: IPlayer[];
     teams: ITeam[];
   };
@@ -18,6 +19,15 @@ export interface IDashboardData {
   highest_points: IPlayer[];
   expected_goals_90: IPlayer[];
   expected_assists_90: IPlayer[];
+}
+
+export interface IElementType {
+  element_count: number,
+  id: number,
+  plural_name: string,
+  plural_name_short: string,
+  singular_name: string,
+  singular_name_short: string,
 }
 
 export interface IPlayer {

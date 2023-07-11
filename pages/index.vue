@@ -26,7 +26,6 @@ watch(data, (_dataNew) => {
     expectedAssists.value = data.value.expected_assists_90;
   }
 });
-console.log("dashboard: ", data.value);
 </script>
 
 <template>

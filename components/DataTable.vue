@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import { IPlayer } from "~/types";
 import { AgGridVue } from "ag-grid-vue3";
-import GridLoadingOverlay from "./GridLoadingOverlay.vue"
-import type {
-  GridApi,
-  GridReadyEvent,
-  ICellRendererParams,
-} from "ag-grid-community";
-
+import GridLoadingOverlay from "./GridLoadingOverlay.vue";
+import type { GridApi, GridReadyEvent } from "ag-grid-community";
 
 defineProps({
   defaultColDef: {},
-  rowData: Array<IPlayer>,
+  rowData: Array,
   colDefs: {},
 });
 
@@ -32,10 +26,11 @@ const onGridReady = (params: GridReadyEvent) => {
 };
 
 function onTableFilterChange() {
-  if (gridApi.value) gridApi.value.setQuickFilter(tableFilter.value);
+  if (gridApi.value) {
+    gridApi.value.setQuickFilter(tableFilter.value);
+    if (tableFilter.value === "") gridApi.value.resetQuickFilter();
+  }
 }
-
-
 </script>
 
 <template>
@@ -64,12 +59,10 @@ function onTableFilterChange() {
           :loadingOverlayComponent="GridLoadingOverlay"
           animateRows="true"
           @grid-ready="onGridReady"
-
         />
       </UCard>
     </UContainer>
   </ClientOnly>
-  
 </template>
 
 <style lang="scss">

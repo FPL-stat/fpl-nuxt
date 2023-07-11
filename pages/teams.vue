@@ -1,66 +1,41 @@
-<script setup lang='ts'>
-import { server } from 'process';
-import type { ITeam } from '../types'
+<script setup lang="ts">
+import { useStatsStore } from "~/stores/data-store";
+import type { ITeam } from "../types";
 
-const teams = ref<ITeam[]>([])
+const stats = useStatsStore()
 
-const { data, pending, error, refresh } = await useLazyFetch<ITeam[]>('/api/teams', { server: false })
+const teams = ref<ITeam[]>();
 
+const columns = reactive({
+  value: [
+    { field: "name", },
+    { field: "short_name",  },
+    { field: "strength",  },
+    { field: "played",  },
+    { field: "win",  },
+    { field: "draw", },
+    { field: "loss", },
+  ],
+});
 
-const tableFilter = ref('')
-const page = ref(1)
-const pageCount = 20
+const defaultColDef = {
+  sortable: true,
+  filter: true,
+  flex: 1,
+  minWidth: 140,
+};
 
-const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'short_name', label: 'Symbol' },
-  { key: 'strength', label: 'Strength', sortable: true },
-  { key: 'played', label: 'Played' },
-  { key: 'win', label: 'Wins', sortable: true },
-  { key: 'draw', label: 'Draws', sortable: true },
-  { key: 'loss', label: 'Losses', sortable: true },
-]
-
-
-const filteredRows = computed(() => {
-  if (!tableFilter.value) {
-    return teams.value
-  }
-  return teams.value.filter((team) => {
-    return Object.values(team).some((value) => {
-      return String(value).toLowerCase().includes(tableFilter.value.toLowerCase())
-    })
-  })
-})
-
-const rows = computed(() => {
-  // return teams.value.slice((page.value - 1) * pageCount, (page.value) * pageCount)
-  return filteredRows.value.slice((page.value - 1) * pageCount, (page.value) * pageCount)
-})
-
-watch(data, newData => {
-  console.log('data arrived...', newData)
-  if (newData) teams.value = newData
-  
-})
 onMounted(async () => {
-  if (data.value) {
-    teams.value = data.value
-  }
-})
-
+  await stats.fetchData()
+  teams.value = stats.getTeams
+  //console.log('teams: ', teams.value)
+});
 </script>
 
 <template>
-  <section class='p-8'>
-
-    <div class='w-60'>
-      <UInput v-model='tableFilter' placeholder='search...' icon="i-heroicons-magnifying-glass-20-solid" />
-    </div>
-
-    <UTable class='overflow-auto' :loading='pending' :columns='columns' :rows='rows' />
-
-    <UPagination v-show='tableFilter.length === 0' v-model="page" :page-count="pageCount" :total="teams.length" />
-
-  </section>
+  <DataTable
+    :defaultColDef="defaultColDef"
+    :colDefs="columns.value"
+    :rowData="teams"
+  />
 </template>
