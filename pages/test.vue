@@ -1,11 +1,12 @@
 <script setup lang="ts">
+  
   const { data: resData } = await useFetch('/api/store')
-
-
-</script>
+  
+  </script>
 
 <template>
-  <div>
-    <div>Get Data: {{ resData }}</div>
-  </div>
+  <ClientOnly>
+    <div>Get Data: {{ resData?.updated }}</div>
+    <div>Time now: {{ new Date().toLocaleString() }}</div>
+  </ClientOnly>
 </template>

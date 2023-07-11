@@ -4,7 +4,7 @@ export const cachedPlayers = cachedFunction(
   async () => {
     try {
       const data = await player.find();
-      const updated = new Date().toISOString()
+      const updated = new Date().toLocaleString()
       return { updated, data };
     } catch (error) {
       console.dir(error);
@@ -16,7 +16,8 @@ export const cachedPlayers = cachedFunction(
     }
   },
   {
-    maxAge: 5 * 60,
+    swr: false,
+    maxAge: 2 * 60, 
     name: "players",
   }
 );
