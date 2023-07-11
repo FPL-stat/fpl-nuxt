@@ -17,7 +17,7 @@ const links = [
     to: "/fixtures",
   },
   {
-    label: "Test",
+    label: "Cache Test",
     to: "/test",
   },
 ];

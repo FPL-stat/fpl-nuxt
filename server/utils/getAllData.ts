@@ -11,7 +11,7 @@ export const cachedData = cachedFunction(
     }
   },
   {
-    maxAge: 2 * 60,
+    maxAge: 12 * 60 * 60,
     swr: false,
     name: "allData",
     group: "appData",
