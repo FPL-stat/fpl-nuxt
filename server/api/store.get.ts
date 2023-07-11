@@ -1,6 +1,7 @@
-import { cachedPlayers } from "../utils/getPlayers"
+// import { cachedPlayers } from "../utils/getPlayers"
+import { cachedData } from "../utils/getAllData"
 
 export default defineEventHandler(async (event) => {
-  const data = await cachedPlayers().catch(() => 0) 
+  const data = await cachedData().catch(() => 0) 
   return data
 })
