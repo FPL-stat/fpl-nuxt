@@ -3,7 +3,7 @@
   import { IPlayer } from "~/types";
   import { useStatsStore } from "../stores/data-store";
 
-const players = ref();
+const players = ref<IPlayer[]|null>();
 const lastUpdated = ref()
 
 const stats = useStatsStore();

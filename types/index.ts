@@ -104,7 +104,7 @@ export interface IPlayer {
   starts: number;
   starts_per_90: number;
   status: string;
-  team: number;
+  team: number | { name: string, short_name: string };
   team_code: number;
   threat: string;
   threat_rank: number;

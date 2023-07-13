@@ -1,20 +1,31 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { useStatsStore } from "~/stores/data-store";
 import type { IPlayer } from "~/types";
 
+interface IPlayerFull extends IPlayer {
+  team: {
+    name: string;
+    short_name: string;
+  };
+  player_type: {
+    name: string;
+    short_name: string;
+  };
+}
+
 const route = useRoute();
-const player = ref<IPlayer | null>();
-console.log("route: ", route.params.code);
+const { code: playerCode } = route.params as { code: string };
+const statsStore = useStatsStore();
 
-const { data, pending, error, refresh } = useLazyFetch<IPlayer>(
-  `/api/players/${route.params.code}`
-);
+const player = ref<IPlayerFull | null>();
 
-watch(data, (newVal) => {
-  player.value = newVal;
-});
+const { getPlayerByCode } = storeToRefs(statsStore);
 
-onMounted(() => {
-  if (data.value) player.value = data.value;
+onMounted(async () => {
+  await statsStore.fetchData();
+  player.value = getPlayerByCode.value(playerCode);
+  //  console.log("player: ", player.value)
 });
 </script>
 
@@ -29,12 +40,14 @@ onMounted(() => {
             <USkeleton class="h-4 w-[200px]" />
           </div>
         </div>
-
-        <div class="flex gap-2">
-          <h4 v-if="player" class="text-lg">
-            {{ player.first_name }} {{ player.second_name }}
-          </h4>
-          <UBadge color="primary">position</UBadge>
+        <div v-if="player">
+          <div class="flex gap-2">
+            <h4 class="text-lg">
+              {{ player.first_name }} {{ player.second_name }}
+            </h4>
+            <UBadge color="primary">{{ player.player_type.name }}</UBadge>
+          </div>
+          <h5 class="text-sm font-semibold">{{ player.team.name }}</h5>
         </div>
       </template>
 
@@ -46,51 +59,62 @@ onMounted(() => {
         <USkeleton class="h-4 w-[250px]" />
       </div>
 
-      <div v-if="player" class="flex justify-center w-aut px-4 overflow-x-auto shadow-lg">
-        <div class="flex flex-col min-w-max w-24 p-2 px-4 justify-center items-center border-x">
-          <div class="text-sm">{{ player.now_cost/10 }}</div>
+      <div
+        v-if="player"
+        class="flex overflow-x-auto px-4 mx-auto whitespace-nowrap shadow-sm"
+      >
+        <div
+          class="flex flex-col justify-center items-center p-2 px-4 ml-auto w-24 min-w-max border-x"
+        >
+          <div class="text-sm">{{ player.now_cost / 10 }}</div>
           <div class="text-xs font-bold">Cost</div>
         </div>
-        <div class="flex flex-col min-w-max w-24 p-2 px-4 justify-center items-center border-x">
+        <div
+          class="flex flex-col justify-center items-center p-2 px-4 w-24 min-w-max border-x"
+        >
           <div class="text-sm">{{ player.selected_by_percent }}%</div>
           <div class="text-xs font-bold">Selected</div>
         </div>
-        <div class="flex flex-col min-w-max w-24 p-2 px-4 justify-center items-center border-x">
+        <div
+          class="flex flex-col justify-center items-center p-2 px-4 w-24 min-w-max border-x"
+        >
           <div class="text-sm">{{ player.points_per_game }}</div>
           <div class="text-xs font-bold">Pts/game</div>
         </div>
-        <div class="flex flex-col min-w-max w-24 p-2 px-4 justify-center items-center border-x">
+        <div
+          class="flex flex-col justify-center items-center p-2 px-4 w-24 min-w-max border-x"
+        >
           <div class="text-sm">{{ player.total_points }}</div>
           <div class="text-xs font-bold">Total Pts</div>
         </div>
-        <div class="flex flex-col min-w-max w-24 p-2 px-4 justify-center items-center border-x">
+        <div
+          class="flex flex-col justify-center items-center p-2 px-4 w-24 min-w-max border-x"
+        >
           <div class="text-sm">{{ player.bonus }}</div>
           <div class="text-xs font-bold">Bonus Pts</div>
         </div>
-        <div class="flex flex-col min-w-max w-24 p-2 px-4 justify-center items-center border-x">
+        <div
+          class="flex flex-col justify-center items-center p-2 px-4 w-24 min-w-max border-x"
+        >
           <div class="text-sm">{{ player.expected_goals_per_90 }}</div>
           <div class="text-xs font-bold">XG (90)</div>
         </div>
-        <div class="flex flex-col min-w-max w-24 p-2 px-4 justify-center items-center border-x">
+        <div
+          class="flex flex-col justify-center items-center p-2 px-4 mr-auto w-24 min-w-max border-x"
+        >
           <div class="text-sm">{{ player.expected_assists_per_90 }}</div>
           <div class="text-xs font-bold">XA (90)</div>
         </div>
       </div>
 
-      <div class="flex justify-evenly mt-2 mb-10">
+      <div class="flex justify-evenly mt-4 mb-10">
         <div class="flex flex-col">
-          <h5 class="text-md font-semibold">Form</h5>
+          <h5 class="font-semibold text-md">Form</h5>
         </div>
         <div class="flex flex-col">
-          <h5 class="text-md font-semibold">Fixtures</h5>
+          <h5 class="font-semibold text-md">Fixtures</h5>
         </div>
       </div>
-  
-      <hr>
-
-      <ul>
-        <li v-for="(stat, key) in player" :key="key">{{ key }}: {{ stat }}</li>
-      </ul>
 
       <template #footer />
     </UCard>

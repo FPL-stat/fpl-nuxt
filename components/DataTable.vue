@@ -3,11 +3,16 @@ import { AgGridVue } from "ag-grid-vue3";
 import GridLoadingOverlay from "./GridLoadingOverlay.vue";
 import type { GridApi, GridReadyEvent } from "ag-grid-community";
 
-defineProps({
-  defaultColDef: {},
-  rowData: Array,
-  colDefs: {},
-});
+//defineProps({
+//  defaultColDef: {},
+//  rowData: Array,
+//  colDefs: {},
+//});
+defineProps<{
+  defaultColDef: {}
+  rowData?: any[]|null
+  colDefs: {}
+}>()
 
 const colorMode = useColorMode();
 const isDark = computed({
