@@ -1,21 +1,24 @@
 <script setup lang="ts">
 import { AgGridVue } from "ag-grid-vue3";
 import GridLoadingOverlay from "./GridLoadingOverlay.vue";
-import type { GridApi, GridReadyEvent, IRowNode, SelectionChangedEvent } from "ag-grid-community";
+import type {
+  GridApi,
+  GridReadyEvent,
+  IRowNode,
+  SelectionChangedEvent,
+} from "ag-grid-community";
 
-//defineProps({
-//  defaultColDef: {},
-//  rowData: Array,
-//  colDefs: {},
-//});
-withDefaults(defineProps<{
-  defaultColDef: {}
-  rowData?: any[]|null
-  colDefs: {}
-  rowSelection?: string
-}>(), {
-  rowSelection: 'single'  
-})
+withDefaults(
+  defineProps<{
+    defaultColDef: {};
+    rowData?: any[] | null;
+    colDefs: {};
+    rowSelection?: string;
+  }>(),
+  {
+    rowSelection: "single",
+  }
+);
 
 const colorMode = useColorMode();
 const isDark = computed({
@@ -26,9 +29,15 @@ const isDark = computed({
     colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
   },
 });
+
 const tableFilter = ref("");
-const selectedRows = ref<IRowNode[]>([])
+const selectedRows = ref<IRowNode[]>([]);
+const showModal = ref(false);
+
+const showSettings = ref(false);
+
 const gridApi = ref<GridApi | null>(null);
+
 const onGridReady = (params: GridReadyEvent) => {
   gridApi.value = params.api;
 };
@@ -41,11 +50,11 @@ function onTableFilterChange() {
 }
 
 function onSelectionChanged(event: SelectionChangedEvent) {
-  selectedRows.value = event.api.getSelectedRows()
+  selectedRows.value = event.api.getSelectedRows();
   if (selectedRows.value.length > 2) {
     // event.api.deselectAll()
-    const selectedNodes = event.api.getSelectedNodes().slice(0,1)!
-    event.api.setNodesSelected({nodes: selectedNodes, newValue: false })
+    const selectedNodes = event.api.getSelectedNodes().slice(0, 1)!;
+    event.api.setNodesSelected({ nodes: selectedNodes, newValue: false });
   }
 }
 </script>
@@ -54,22 +63,34 @@ function onSelectionChanged(event: SelectionChangedEvent) {
   <ClientOnly>
     <UContainer class="py-4">
       <UCard>
-      <div class="flex justify-between items-center pb-2">
-        <div class="w-60">
-          <UInput
-            id="table-quick-filter"
-            @input="onTableFilterChange"
-            v-model="tableFilter"
-            placeholder="search..."
-            icon="i-heroicons-magnifying-glass-20-solid"
-          />
-        </div>
-        <div class="">
-          <UButton size="xs" v-show="selectedRows.length === 2" variant="solid" >Compare</UButton>
+        <div class="flex justify-between items-center pb-2">
+          <div class="w-54">
+            <UInput
+              id="table-quick-filter"
+              @input="onTableFilterChange"
+              v-model="tableFilter"
+              placeholder="search..."
+              icon="i-heroicons-magnifying-glass-20-solid"
+            />
+          </div>
+          <div class="flex gap-2">
+            <UButton
+              size="xs"
+              v-show="selectedRows.length === 2"
+              variant="solid"
+              @click="showModal = !showModal"
+              >Compare</UButton
+            >
+            <UButton
+              size="sm"
+              square
+              icon="i-heroicons-cog-8-tooth"
+              variant="ghost"
+              @click="showSettings = !showSettings"
+            />
+          </div>
         </div>
 
-      </div>
-        
         <AgGridVue
           :class="{
             'ag-theme-alpine-dark': isDark,
@@ -88,6 +109,39 @@ function onSelectionChanged(event: SelectionChangedEvent) {
       </UCard>
     </UContainer>
   </ClientOnly>
+  <USlideover v-model="showSettings" :ui="{ width: 'w-screen max-w-xs' }">
+      <div class="flex justify-between p-4">
+        <h3 class="text-lg">Settings</h3>
+        <UButton
+          @click="showSettings = false"
+          icon="i-heroicons-x-mark"
+          variant="ghost"
+          square
+          size="xs"
+          color="gray"
+        />
+      </div>
+  </USlideover>
+  <UModal v-model="showModal">
+    <UCard>
+      <template #header>
+        <div class="flex justify-between">
+          <h3>Head to Head</h3>
+          <UButton
+            @click="showModal = false"
+            icon="i-heroicons-x-mark"
+            variant="ghost"
+            square
+            size="xs"
+            color="gray"
+          />
+        </div>
+      </template>
+      <div>
+        {{ selectedRows[0] }}
+      </div>
+    </UCard>
+  </UModal>
 </template>
 
 <style lang="scss">
