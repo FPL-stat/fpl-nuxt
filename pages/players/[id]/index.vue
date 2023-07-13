@@ -15,17 +15,30 @@ interface IPlayerFull extends IPlayer {
 }
 
 const route = useRoute();
-const { code: playerCode } = route.params as { code: string };
+const { id: playerId } = route.params as { id: string };
 const statsStore = useStatsStore();
 
 const player = ref<IPlayerFull | null>();
+const badgeColor = ref()
 
 const { getPlayerByCode } = storeToRefs(statsStore);
+enum BadgeColor {
+  GKP = 'orange',
+  DEF = 'primary',
+  MID = 'green',
+  FWD = 'red'
+}
+function setBadgeColor() {
+  const playerType = player.value?.player_type.short_name!;
+  if (playerType in BadgeColor) {
+    badgeColor.value = BadgeColor[playerType as keyof typeof BadgeColor];
+  }  
+}
 
 onMounted(async () => {
   await statsStore.fetchData();
-  player.value = getPlayerByCode.value(playerCode);
-  //  console.log("player: ", player.value)
+  player.value = getPlayerByCode.value(playerId);
+  setBadgeColor()
 });
 </script>
 
@@ -45,7 +58,7 @@ onMounted(async () => {
             <h4 class="text-lg">
               {{ player.first_name }} {{ player.second_name }}
             </h4>
-            <UBadge color="primary">{{ player.player_type.name }}</UBadge>
+            <UBadge :color="badgeColor">{{ player.player_type.name }}</UBadge>
           </div>
           <h5 class="text-sm font-semibold">{{ player.team.name }}</h5>
         </div>

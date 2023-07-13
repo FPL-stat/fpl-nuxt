@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { AgGridVue } from "ag-grid-vue3";
 import GridLoadingOverlay from "./GridLoadingOverlay.vue";
-import type { GridApi, GridReadyEvent } from "ag-grid-community";
+import type { GridApi, GridReadyEvent, IRowNode, SelectionChangedEvent } from "ag-grid-community";
 
 //defineProps({
 //  defaultColDef: {},
 //  rowData: Array,
 //  colDefs: {},
 //});
-defineProps<{
+withDefaults(defineProps<{
   defaultColDef: {}
   rowData?: any[]|null
   colDefs: {}
-}>()
+  rowSelection?: string
+}>(), {
+  rowSelection: 'single'  
+})
 
 const colorMode = useColorMode();
 const isDark = computed({
@@ -24,7 +27,7 @@ const isDark = computed({
   },
 });
 const tableFilter = ref("");
-
+const selectedRows = ref<IRowNode[]>([])
 const gridApi = ref<GridApi | null>(null);
 const onGridReady = (params: GridReadyEvent) => {
   gridApi.value = params.api;
@@ -36,13 +39,23 @@ function onTableFilterChange() {
     if (tableFilter.value === "") gridApi.value.resetQuickFilter();
   }
 }
+
+function onSelectionChanged(event: SelectionChangedEvent) {
+  selectedRows.value = event.api.getSelectedRows()
+  if (selectedRows.value.length > 2) {
+    // event.api.deselectAll()
+    const selectedNodes = event.api.getSelectedNodes().slice(0,1)!
+    event.api.setNodesSelected({nodes: selectedNodes, newValue: false })
+  }
+}
 </script>
 
 <template>
   <ClientOnly>
     <UContainer class="py-4">
       <UCard>
-        <div class="mb-2 w-60">
+      <div class="flex justify-between items-center pb-2">
+        <div class="w-60">
           <UInput
             id="table-quick-filter"
             @input="onTableFilterChange"
@@ -51,7 +64,12 @@ function onTableFilterChange() {
             icon="i-heroicons-magnifying-glass-20-solid"
           />
         </div>
+        <div class="">
+          <UButton size="xs" v-show="selectedRows.length === 2" variant="solid" >Compare</UButton>
+        </div>
 
+      </div>
+        
         <AgGridVue
           :class="{
             'ag-theme-alpine-dark': isDark,
@@ -61,9 +79,11 @@ function onTableFilterChange() {
           :defaultColDef="defaultColDef"
           :columnDefs="colDefs"
           :rowData="rowData"
+          :rowSelection="rowSelection"
           :loadingOverlayComponent="GridLoadingOverlay"
           animateRows="true"
           @grid-ready="onGridReady"
+          @selection-changed="onSelectionChanged"
         />
       </UCard>
     </UContainer>

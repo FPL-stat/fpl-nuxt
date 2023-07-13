@@ -34,13 +34,13 @@ export const useStatsStore = defineStore("stats", () => {
   });
 
   const getPlayerByCode = computed(() => {
-    return (code: string) => {
+    return (id: string) => {
       if (data.value) {
         const players = data.value.data.elements;
         const teams = data.value.data.teams;
         const playerTypes = data.value.data.element_types;
 
-        const player = players.find((player) => player.code == parseInt(code));
+        const player = players.find((player) => player.id == parseInt(id));
         if (!player) return null;
 
         const team = teams.find((team) => team.id === player.team)!;

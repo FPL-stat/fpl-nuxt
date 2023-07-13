@@ -73,6 +73,7 @@ export interface IPlayer {
   ict_index: string;
   ict_index_rank: number;
   ict_index_rank_type: number;
+  id: number;
   in_dreamteam: boolean;
   influence: string;
   influence_rank: number;
