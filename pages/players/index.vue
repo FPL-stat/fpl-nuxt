@@ -1,33 +1,15 @@
 <script setup lang="ts">
-import { AgGridVue } from "ag-grid-vue3";
-import type {
-  GridApi,
-  GridReadyEvent,
-  ICellRendererParams,
-} from "ag-grid-community";
-import { reactive } from "vue";
+  import { ICellRendererParams } from "ag-grid-community";
+  import { IPlayer } from "~/types";
+  import { useStatsStore } from "~/stores/data-store";
 
-import { IPlayer } from "~/types";
+const players = ref<IPlayer[]|null>();
+const lastUpdated = ref()
 
-import GridLoadingOverlay from "../../components/GridLoadingOverlay.vue"
+const stats = useStatsStore();
+const router = useRouter()
 
-const router = useRouter();
-
-const colorMode = useColorMode();
-const isDark = computed({
-  get() {
-    return colorMode.value === "dark";
-  },
-  set() {
-    colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
-  },
-});
-
-const { data } = useLazyAsyncData<IPlayer[]>("players", () =>
-  $fetch("/api/players")
-);
-
-function linkRenderer(params: ICellRendererParams<IPlayer>) {
+function playerLinkRenderer(params: ICellRendererParams<IPlayer>) {
   const route = {
     name: "players-code",
     params: { code: params.data?.code },
@@ -42,29 +24,27 @@ function linkRenderer(params: ICellRendererParams<IPlayer>) {
   return link;
 }
 
-const tableFilter = ref("");
 
-const gridApi = ref<GridApi | null>(null);
-const onGridReady = (params: GridReadyEvent) => {
-  gridApi.value = params.api;
-};
-
-const rowData = reactive({ rows: <IPlayer[]|null>null });
-const columnDefs = reactive({
+const colDefs = reactive({
   value: [
     {
       headerName: "Second Name",
       field: "second_name",
       resizable: true,
-      cellRenderer: linkRenderer,
+      cellRenderer: playerLinkRenderer
     },
-    { headerName: "First Name", field: "first_name" },
-    { headerName: "Total Points", field: "total_points" },
+    { headerName: "First Name", field: "first_name", resizable: true },
+    { headerName: "Team", field: "team.short_name", resizable: true,  minWidth: 85, width: 90 },
+    { headerName: "Position", field: "player_type.short_name", resizable: true,  minWidth: 110 },
+    { headerName: "Total Points", field: "total_points", maxWidth: 130 },
+    { headerName: "Selected (%)", field: "selected_by_percent" },
+    { headerName: "XG(90)", field: "expected_goals_per_90", maxWidth: 100, minWidth:100 },
+    { headerName: "XA(90)", field: "expected_assists_per_90", maxWidth: 100, minWidth:100 },
     { headerName: "Starts", field: "starts", minWidth: 100 },
     { headerName: "Season Value", field: "value_season" },
-    { headerName: "Selected (%)", field: "selected_by_percent" },
   ],
 });
+
 const defaultColDef = {
   sortable: true,
   filter: true,
@@ -72,76 +52,18 @@ const defaultColDef = {
   minWidth: 140,
 };
 
-function onTableFilterChange() {
-  if (gridApi.value) gridApi.value.setQuickFilter(tableFilter.value);
-}
-
-watch(data, (newData) => {
-  if (newData) rowData.rows = newData;
+onMounted(async () => {
+  await stats.fetchData();
+  players.value = stats.getPlayers;
+  lastUpdated.value = stats.getData?.updated
 });
-
-onMounted(() => {
-  if (data.value) rowData.rows = data.value
-})
 </script>
 
 <template>
-  <ClientOnly>
-    <!-- <div class="py-4 px-4 overflow-auto"> -->
-    <UContainer class="py-4">
-      <UCard class="shadow-lg">
-        <div class="mb-2 w-60">
-          <UInput
-            id="table-quick-filter"
-            @input="onTableFilterChange"
-            v-model="tableFilter"
-            placeholder="search..."
-            icon="i-heroicons-magnifying-glass-20-solid"
-          />
-        </div>
-
-        <AgGridVue
-          :class="{
-            'ag-theme-alpine-dark': isDark,
-            'ag-theme-alpine': !isDark,
-          }"
-          style="height: 500px"
-          :loadingOverlayComponent="GridLoadingOverlay"
-          :columnDefs="columnDefs.value"
-          :rowData="rowData.rows"
-          :defaultColDef="defaultColDef"
-          animateRows="true"
-          @grid-ready="onGridReady"
-        />
-      </UCard>
-    </UContainer>
-    <!-- </div> -->
-  </ClientOnly>
+  <ClientOnly v-if="lastUpdated">{{ new Date(lastUpdated).toLocaleString() }}</ClientOnly>
+  <DataTable
+    :defaultColDef="defaultColDef"
+    :rowData="players"
+    :colDefs="colDefs.value"
+  />
 </template>
-
-<style lang="scss">
-@use "../../node_modules/ag-grid-community/styles" as ag;
-
-@include ag.grid-styles(
-  (
-    themes: (
-      alpine-dark: (
-        borders: none,
-        header-background-color: transparent,
-        background-color: #171717,
-        odd-row-background-color: transparent,
-        data-color: #737373,
-        row-hover-color: rgb(115, 115, 115, 0.1),
-      ),
-      alpine: (
-        borders: none,
-        header-background-color: transparent,
-        background-color: #fff,
-        odd-row-background-color: transparent,
-        data-color: #737373,
-        row-hover-color: rgb(59, 130, 246, 0.2),
-      ),
-    ),
-  )
-);
-</style>

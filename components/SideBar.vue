@@ -16,10 +16,10 @@ const links = [
     label: "Fixtures",
     to: "/fixtures",
   },
-  {
-    label: "Cache Test",
-    to: "/test",
-  },
+  //{
+  //  label: "Cache Test",
+  //  to: "/test",
+  //},
 ];
 </script>
 
