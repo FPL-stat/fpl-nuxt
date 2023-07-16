@@ -32,7 +32,6 @@ const isDark = computed({
 
 const tableFilter = ref("");
 const selectedRows = ref<IRowNode[]>([]);
-const showModal = ref(false);
 
 const showSettings = ref(false);
 
@@ -63,7 +62,7 @@ function onSelectionChanged(event: SelectionChangedEvent) {
   <ClientOnly>
     <UContainer class="py-4">
       <UCard>
-        <div class="flex justify-between items-center pb-2">
+        <div class="flex gap-2 justify-between items-center pb-2">
           <div class="w-54">
             <UInput
               id="table-quick-filter"
@@ -78,7 +77,6 @@ function onSelectionChanged(event: SelectionChangedEvent) {
               size="xs"
               v-show="selectedRows.length === 2"
               variant="solid"
-              @click="showModal = !showModal"
               >Compare</UButton
             >
             <UButton
