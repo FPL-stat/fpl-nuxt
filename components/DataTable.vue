@@ -110,38 +110,18 @@ function onSelectionChanged(event: SelectionChangedEvent) {
     </UContainer>
   </ClientOnly>
   <USlideover v-model="showSettings" :ui="{ width: 'w-screen max-w-xs' }">
-      <div class="flex justify-between p-4">
-        <h3 class="text-lg">Settings</h3>
-        <UButton
-          @click="showSettings = false"
-          icon="i-heroicons-x-mark"
-          variant="ghost"
-          square
-          size="xs"
-          color="gray"
-        />
-      </div>
+    <div class="flex justify-between p-4">
+      <h3 class="text-lg">Settings</h3>
+      <UButton
+        @click="showSettings = false"
+        icon="i-heroicons-x-mark"
+        variant="ghost"
+        square
+        size="xs"
+        color="gray"
+      />
+    </div>
   </USlideover>
-  <UModal v-model="showModal">
-    <UCard>
-      <template #header>
-        <div class="flex justify-between">
-          <h3>Head to Head</h3>
-          <UButton
-            @click="showModal = false"
-            icon="i-heroicons-x-mark"
-            variant="ghost"
-            square
-            size="xs"
-            color="gray"
-          />
-        </div>
-      </template>
-      <div>
-        {{ selectedRows[0] }}
-      </div>
-    </UCard>
-  </UModal>
 </template>
 
 <style lang="scss">

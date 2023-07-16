@@ -1,28 +1,45 @@
 <script setup lang="ts">
 import { ICellRendererParams } from "ag-grid-community";
-import { IPlayer } from "~/types";
+import { IPlayer, IPlayerFull } from "~/types";
 import { useStatsStore } from "~/stores/data-store";
 
 const players = ref<IPlayer[] | null>();
+
+const selectedPlayer = ref<IPlayerFull|null>(null)
+const showPlayer = ref(false)
+
 const lastUpdated = ref();
 
 const stats = useStatsStore();
-const router = useRouter();
+// const router = useRouter();
 
-function playerLinkRenderer(params: ICellRendererParams<IPlayer>) {
-  const route = {
-    name: "players-id",
-    params: { id: params.data?.id },
-  };
-  const link = document.createElement("a");
-  link.href = router.resolve(route).href;
-  link.innerText = params.value;
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    router.push(route);
-  });
-  return link;
+//function playerLinkRenderer(params: ICellRendererParams<IPlayer>) {
+  //const route = {
+    //name: "players-id",
+    //params: { id: params.data?.id },
+  //};
+  //const link = document.createElement("a");
+  //link.href = router.resolve(route).href;
+  //link.innerText = params.value;
+  //link.addEventListener("click", (e) => {
+    //e.preventDefault();
+    //router.push(route);
+  //});
+  //return link;
+//}
+
+function playerLinkRenderer(params: ICellRendererParams<IPlayerFull>) {
+  const link = document.createElement('a')
+  link.innerText = params.value
+  link.href='/players'
+  link.addEventListener("click", e => {
+    e.preventDefault()
+    selectedPlayer.value = params.data!
+    showPlayer.value = true
+  })
+  return link
 }
+
 
 const colDefs = reactive({
   value: [
@@ -32,6 +49,7 @@ const colDefs = reactive({
       checkboxSelection: true,
       resizable: true,
       cellRenderer: playerLinkRenderer,
+      minWidth: 160,
     },
     { headerName: "First Name", field: "first_name", resizable: true },
     {
@@ -77,6 +95,7 @@ onMounted(async () => {
   await stats.fetchData();
   players.value = stats.getPlayers;
   lastUpdated.value = stats.getData?.updated;
+  console.log(stats.data)
 });
 </script>
 
@@ -92,4 +111,5 @@ onMounted(async () => {
       Last updated: {{ new Date(lastUpdated).toLocaleString() }}
     </div>
   </ClientOnly>
+  <UModal v-model="showPlayer"><PlayerCard :player="selectedPlayer" @close="showPlayer = false" /></UModal>
 </template>

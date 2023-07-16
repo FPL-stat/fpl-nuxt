@@ -33,7 +33,7 @@ export const useStatsStore = defineStore("stats", () => {
     }
   });
 
-  const getPlayerByCode = computed(() => {
+  const getPlayerById = computed(() => {
     return (id: string) => {
       if (data.value) {
         const players = data.value.data.elements;
@@ -69,5 +69,5 @@ export const useStatsStore = defineStore("stats", () => {
     data.value = await $fetch<IAppData>("/api/store");
   }
 
-  return { data, fetchData, getData, getPlayers, getPlayerByCode, getTeams };
+  return { data, fetchData, getData, getPlayers, getPlayerById, getTeams };
 });

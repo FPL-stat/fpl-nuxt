@@ -21,7 +21,7 @@ const statsStore = useStatsStore();
 const player = ref<IPlayerFull | null>();
 const badgeColor = ref()
 
-const { getPlayerByCode } = storeToRefs(statsStore);
+const { getPlayerById } = storeToRefs(statsStore);
 enum BadgeColor {
   GKP = 'orange',
   DEF = 'primary',
@@ -37,7 +37,7 @@ function setBadgeColor() {
 
 onMounted(async () => {
   await statsStore.fetchData();
-  player.value = getPlayerByCode.value(playerId);
+  player.value = getPlayerById.value(playerId);
   setBadgeColor()
 });
 </script>
@@ -77,7 +77,7 @@ onMounted(async () => {
         class="flex overflow-x-auto px-4 mx-auto whitespace-nowrap shadow-sm"
       >
         <div
-          class="flex flex-col justify-center items-center p-2 px-4 ml-auto w-24 min-w-max border-x"
+          class="flex flex-col justify-center items-center p-2 px-4 ml-auto w-24 min-w-[20%] border-x"
         >
           <div class="text-sm">{{ player.now_cost / 10 }}</div>
           <div class="text-xs font-bold">Cost</div>

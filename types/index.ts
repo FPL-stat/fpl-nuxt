@@ -123,6 +123,16 @@ export interface IPlayer {
   web_name: string;
   yellow_cards: number;
 }
+export interface IPlayerFull extends IPlayer {
+  team: {
+    name: string;
+    short_name: string;
+  };
+  player_type: {
+    name: string;
+    short_name: string;
+  };
+}
 
 export interface ITeam {
   id: number,
