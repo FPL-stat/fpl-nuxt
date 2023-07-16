@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { IPlayerFull } from "~/types";
 
-const props = defineProps<{
-  player: IPlayerFull|null;
+defineProps<{
+  player: IPlayerFull | null;
 }>();
-
-onMounted(() => {
-  console.log("PlayerCard props: ", props.player);
-});
 </script>
 
 <template>
@@ -15,11 +11,35 @@ onMounted(() => {
     <template #header>
       <div v-if="player">
         <div class="flex justify-between">
-          <div class="flex gap-2">
+          <div class="flex gap-2 items-top">
             <h4 class="text-lg">
               {{ player.first_name }} {{ player.second_name }}
             </h4>
-            <UBadge color="primary">{{ player.player_type.name }}</UBadge>
+            <div class="self-start">
+              <UBadge
+                v-if="player.player_type.short_name === 'DEF'"
+                color="primary"
+                >{{ player.player_type.name }}</UBadge
+              >
+              <UBadge
+                v-else-if="player.player_type.short_name === 'FWD'"
+                color="red"
+                >{{ player.player_type.name }}</UBadge
+              >
+              <UBadge
+                v-else-if="player.player_type.short_name === 'MID'"
+                color="green"
+                >{{ player.player_type.name }}</UBadge
+              >
+              <UBadge
+                v-else-if="player.player_type.short_name === 'GKP'"
+                color="orange"
+                >{{ player.player_type.name }}</UBadge
+              >
+              <UBadge v-else color="primary">{{
+                player.player_type.name
+              }}</UBadge>
+            </div>
           </div>
           <div>
             <UButton

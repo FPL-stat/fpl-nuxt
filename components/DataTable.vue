@@ -7,6 +7,7 @@ import type {
   IRowNode,
   SelectionChangedEvent,
 } from "ag-grid-community";
+import { useStatsStore } from "~/stores/data-store";
 
 withDefaults(
   defineProps<{
@@ -30,6 +31,9 @@ const isDark = computed({
   },
 });
 
+const appStore = useStatsStore()
+
+
 const tableFilter = ref("");
 const selectedRows = ref<IRowNode[]>([]);
 
@@ -50,6 +54,8 @@ function onTableFilterChange() {
 
 function onSelectionChanged(event: SelectionChangedEvent) {
   selectedRows.value = event.api.getSelectedRows();
+
+  appStore.comparedPlayers = selectedRows.value
   if (selectedRows.value.length > 2) {
     // event.api.deselectAll()
     const selectedNodes = event.api.getSelectedNodes().slice(0, 1)!;
@@ -73,12 +79,16 @@ function onSelectionChanged(event: SelectionChangedEvent) {
             />
           </div>
           <div class="flex gap-2">
-            <UButton
-              size="xs"
-              v-show="selectedRows.length === 2"
-              variant="solid"
-              >Compare</UButton
+            <NuxtLink 
+              v-if="selectedRows.length === 2" 
+              :to="`/players/compare?p1=${selectedRows[0].id}&p2=${selectedRows[1].id}`"
             >
+              <UButton
+                size="xs"
+                variant="solid"
+                >Compare</UButton
+              >
+            </NuxtLink>
             <UButton
               size="sm"
               square

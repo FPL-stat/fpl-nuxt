@@ -95,7 +95,6 @@ onMounted(async () => {
   await stats.fetchData();
   players.value = stats.getPlayers;
   lastUpdated.value = stats.getData?.updated;
-  console.log(stats.data)
 });
 </script>
 

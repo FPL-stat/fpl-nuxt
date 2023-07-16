@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
-import { IAppData, IPlayer } from "~/types";
+import { IAppData, IPlayerFull } from "~/types";
 
 export const useStatsStore = defineStore("stats", () => {
   const data = ref<IAppData | null>();
+
+  const comparedPlayers = ref<IPlayerFull[]|null>([])
 
   const getData = computed(() => data.value);
 
@@ -69,5 +71,5 @@ export const useStatsStore = defineStore("stats", () => {
     data.value = await $fetch<IAppData>("/api/store");
   }
 
-  return { data, fetchData, getData, getPlayers, getPlayerById, getTeams };
+  return { data, comparedPlayers, fetchData, getData, getPlayers, getPlayerById, getTeams };
 });
